@@ -3,60 +3,43 @@
 import Link from "next/link"
 import { useState } from "react"
 import { ChevronLeft } from "lucide-react"
+import { activeExams, upcomingExams, completedExams } from "@/data/activeexam"
 
 export function ActiveExamsPage() {
   const [activeTab, setActiveTab] = useState("Active")
 
-  const exams = [
-    {
-      title: "Mid - Term: Network Security",
-      date: "05 Aug, 2025",
-      endTime: "Ends in 00:56",
-      violations: "10 Violations",
-      status: "Active",
-    },
-    {
-      title: "Mid - Term: Network Security",
-      date: "05 Aug, 2025",
-      endTime: "Ends in 00:56",
-      violations: "10 Violations",
-      status: "Active",
-    },
-    {
-      title: "Mid - Term: Network Security",
-      date: "05 Aug, 2025",
-      endTime: "Ends in 00:56",
-      violations: "10 Violations",
-      status: "Active",
-    },
-    {
-      title: "Mid - Term: Network Security",
-      date: "05 Aug, 2025",
-      endTime: "Ends in 00:56",
-      violations: "10 Violations",
-      status: "Active",
-    },
-    {
-      title: "Mid - Term: Network Security",
-      date: "05 Aug, 2025",
-      endTime: "Ends in 00:56",
-      violations: "10 Violations",
-      status: "Active",
-    },
-    {
-      title: "Mid - Term: Network Security",
-      date: "05 Aug, 2025",
-      endTime: "Ends in 00:56",
-      violations: "10 Violations",
-      status: "Active",
-    },
-  ]
-
   const tabs = ["Active", "Upcoming", "Completed"]
 
+  const getCurrentExams = () => {
+    switch (activeTab) {
+      case "Active":
+        return activeExams
+      case "Upcoming":
+        return upcomingExams
+      case "Completed":
+        return completedExams
+      default:
+        return activeExams
+    }
+  }
+
+  const getStatusBadge = (status: string) => {
+  switch (status) {
+    case "Active":
+      return "bg-white text-green-600"     // white bg + green text
+    case "Upcoming":
+      return "bg-sky-100 text-blue-900"    // light sky bg + dark blue text
+    case "Completed":
+      return "bg-gray-300 text-gray-600"   // ✅ light gray bg + medium gray text
+    default:
+      return "bg-white text-gray-800"
+  }
+}
+
+
   return (
-    <div className=" mx-auto  sm:px-2 lg:px-2 ">
-      <div className="bg-gray-900 rounded-xl p-4 sm:p-6 border border-gray-700">
+    <div className="mx-auto sm:px-2 lg:px-2">
+      <div className="bg-card rounded-xl p-4 sm:p-6 border border-gray-700">
         {/* Header with Back Button */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 sm:mb-8 gap-4">
           <h1 className="text-white text-xl sm:text-2xl font-semibold">Active / Upcoming Exams</h1>
@@ -68,14 +51,15 @@ export function ActiveExamsPage() {
           </Link>
         </div>
 
-        {/* Tabs */}
-        <div className="flex flex-wrap sm:flex-nowrap space-x-0 sm:space-x-8 mb-6 sm:mb-8 border border-gray-700 bg-gray-800 rounded-lg py-3 px-4">
+        <div className="flex space-x-0 mb-6 sm:mb-8">
           {tabs.map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`mb-2 sm:mb-0 pb-2 px-4 font-medium transition-colors rounded-md whitespace-nowrap ${
-                activeTab === tab ? "bg-gray-800 text-red-500" : "text-gray-400 hover:text-white bg-transparent"
+              className={`px-6 py-3 font-medium transition-colors border-b-2 ${
+                activeTab === tab
+                  ? "text-orange-500 border-orange-500"
+                  : "text-gray-400 hover:text-white border-transparent"
               }`}
             >
               {tab}
@@ -83,35 +67,28 @@ export function ActiveExamsPage() {
           ))}
         </div>
 
-        {/* Exams List */}
         <div className="space-y-4">
-          {exams.map((exam, index) => (
+          {getCurrentExams().map((exam, index) => (
             <div
               key={index}
-              className="bg-gray-900 rounded-lg p-4 sm:p-6 border border-gray-600 flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-0"
+              className="bg-card rounded-lg p-6 border border-gray-700 flex items-center justify-between"
             >
               {/* Exam Info */}
               <div className="flex-1">
-                <h3 className="text-white font-semibold text-base sm:text-lg mb-1 sm:mb-2 break-words">{exam.title}</h3>
-                <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-gray-400 text-xs sm:text-sm">
+                <h3 className="text-white font-semibold text-lg mb-2">{exam.title}</h3>
+                <div className="flex items-center gap-2 text-gray-400 text-sm">
                   <span>{exam.date}</span>
                   <span>•</span>
-                  <span>{exam.endTime}</span>
+                  <span>{exam.time}</span>
                 </div>
               </div>
 
-              {/* Status and Violations */}
-              <div className="flex items-center space-x-6">
-                {/* Light white vertical line */}
-                <div className="hidden sm:block w-0.5 bg-white/20 rounded-full h-12" />
-
-                {/* Violations and Status stacked vertically */}
-                <div className="flex flex-col justify-center space-y-1">
-                  <div className="text-gray-400 text-xs sm:text-sm">{exam.violations}</div>
-                  <div className="bg-white text-green-600 px-4 py-1 rounded-md text-xs sm:text-sm font-medium text-center whitespace-nowrap">
-                    {exam.status}
-                  </div>
-                </div>
+              {/* Status and Info with Vertical Line */}
+              <div className="flex flex-col items-end space-y-2 border-l border-gray-600 pl-4">
+                <span className={`px-4 py-1 rounded-md text-sm font-medium ${getStatusBadge(exam.status)}`}>
+                  {exam.status}
+                </span>
+                <div className="text-gray-400 text-sm">{exam.info}</div>
               </div>
             </div>
           ))}

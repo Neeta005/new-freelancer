@@ -5,6 +5,7 @@ import { Eye, Edit3, Trash2 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { DifficultyBadge } from "@/components/ui/difficulty-badge"
 import { Pagination } from "@/components/ui/reusable-pagination"
+import { DataTable } from "@/components/tables/data-table"
 import { mockQuestions } from "@/data/questions"
 
 interface QuestionSectionProps {
@@ -53,6 +54,59 @@ export function QuestionSection({ topicName, onBack }: QuestionSectionProps) {
   const handleEditTopic = () => {
     console.log("[v0] Edit topic")
   }
+
+  const columns = [
+    {
+      key: "sr",
+      header: "Sr.",
+      render: (value: any, question: any) => <span className="text-card-foreground text-sm">{question.sr}</span>,
+    },
+    {
+      key: "question",
+      header: "Question",
+      render: (value: any, question: any) => <span className="text-card-foreground text-sm">{question.question}</span>,
+    },
+    {
+      key: "type",
+      header: "Type",
+      render: (value: any, question: any) => <span className="text-muted-foreground text-sm">{question.type}</span>,
+    },
+    {
+      key: "difficulty",
+      header: "Difficulty",
+      render: (value: any, question: any) => <DifficultyBadge difficulty={question.difficulty} />,
+    },
+    {
+      key: "marks",
+      header: "Marks",
+      render: (value: any, question: any) => <span className="text-card-foreground text-sm">{question.marks}</span>,
+    },
+    {
+      key: "status",
+      header: "Status",
+      render: (value: any, question: any) => <StatusBadge status={question.status} />,
+    },
+    {
+      key: "actions",
+      header: "Actions",
+      render: (value: any, question: any) => (
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => handleDelete(question.id)}
+            className="flex items-center justify-center p-2 size-8 bg-pink-500/10 rounded transition-colors hover:bg-pink-500/20"
+          >
+            <Trash2 size={12} className="text-pink-500" />
+          </button>
+          <button
+            onClick={() => handleEdit(question.id)}
+            className="flex items-center justify-center size-8 p-2 rounded bg-gradient-to-r from-orange-200/10 to-pink-600/10 hover:from-orange-200/20 hover:to-pink-600/20 transition-colors"
+          >
+            <Edit3 size={12} className="text-orange-500" />
+          </button>
+        </div>
+      ),
+    },
+  ]
 
   return (
     <div className="flex-1 p-4 bg-background min-h-screen">
@@ -134,50 +188,12 @@ export function QuestionSection({ topicName, onBack }: QuestionSectionProps) {
           </div>
         </div>
 
-        <div className="bg-muted rounded-xl overflow-hidden border border-border">
-          <div className="grid grid-cols-12 gap-4 px-6 py-4 border-b border-border bg-card">
-            <div className="col-span-1 text-muted-foreground text-sm font-semibold">Sr.</div>
-            <div className="col-span-4 text-muted-foreground text-sm font-semibold">Question</div>
-            <div className="col-span-1 text-muted-foreground text-sm font-semibold">Type</div>
-            <div className="col-span-1 text-muted-foreground text-sm font-semibold">Difficulty</div>
-            <div className="col-span-1 text-muted-foreground text-sm font-semibold">Marks</div>
-            <div className="col-span-2 text-muted-foreground text-sm font-semibold">Status</div>
-            <div className="col-span-2 text-muted-foreground text-sm font-semibold">Actions</div>
-          </div>
-
-          {mockQuestions?.map((question) => (
-            <div
-              key={question.id}
-              className="grid grid-cols-12 gap-4 px-6 py-4 border-b border-border hover:bg-accent transition-colors"
-            >
-              <div className="col-span-1 text-card-foreground text-sm">{question.sr}</div>
-              <div className="col-span-4 text-card-foreground text-sm">{question.question}</div>
-              <div className="col-span-1 text-muted-foreground text-sm">{question.type}</div>
-              <div className="col-span-1">
-                <DifficultyBadge difficulty={question.difficulty} />
-              </div>
-              <div className="col-span-1 text-card-foreground text-sm">{question.marks}</div>
-              <div className="col-span-2">
-                <StatusBadge status={question.status} />
-              </div>
-              <div className="col-span-2 flex items-center gap-2">
-                <button
-                  onClick={() => handleDelete(question.id)}
-                  className="flex items-center justify-center p-2 size-8 bg-pink-500/10 rounded transition-colors hover:bg-pink-500/20"
-                >
-<Trash2 size={12} className="text-pink-500" />
-                </button>
-                <button
-                  onClick={() => handleEdit(question.id)}
-                  className="flex items-center justify-center size-8 p-2 rounded bg-gradient-to-r from-orange-200/10 to-pink-600/10 hover:from-orange-200/20 hover:to-pink-600/20 transition-colors"
-                >
-              <Edit3 size={12} className="text-orange-500" />
-
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
+        <DataTable
+          data={mockQuestions}
+          columns={columns}
+          className="bg-muted rounded-xl overflow-hidden border border-border"
+          headerClassName="bg-card"
+        />
 
         <div className="mt-6">
           <Pagination

@@ -3,18 +3,15 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Search } from "lucide-react"
 import Link from "next/link"
 import { SectionForm } from "./section-form"
 import { FileUploadSection } from "./file-upload-section"
 import { SyllabusPreview } from "./syllabus-preview"
-import {
-  type Section,
-  type UploadedFile,
-  targetAudienceOptions,
-  initialSections,
-  gradientButtonStyle,
-} from "@/data/syllabus"
+import { FormField } from "@/components/ui/form-field"
+import { SearchInput } from "@/components/ui/search-input"
+import { TabButton } from "@/components/ui/tab-button"
+import { GradientButton } from "@/components/ui/gradient-button"
+import { type Section, type UploadedFile, targetAudienceOptions, initialSections } from "@/data/syllabus"
 
 export function AddSyllabus() {
   const [activeTab, setActiveTab] = useState<"manual" | "upload">("manual")
@@ -30,48 +27,28 @@ export function AddSyllabus() {
           <h1 className="text-xl sm:text-2xl font-semibold text-card-foreground mb-6">Add Syllabus</h1>
 
           <div className="flex gap-0 mb-6">
-            <button
-              onClick={() => setActiveTab("manual")}
-              className={`px-6 py-2 text-sm font-medium rounded-l-md transition-colors ${
-                activeTab === "manual"
-                  ? `text-white ${gradientButtonStyle}`
-                  : "bg-muted text-muted-foreground hover:bg-accent"
-              }`}
-            >
+            <TabButton active={activeTab === "manual"} onClick={() => setActiveTab("manual")} position="left">
               Manual
-            </button>
-            <button
-              onClick={() => setActiveTab("upload")}
-              className={`px-6 py-2 text-sm font-medium rounded-r-md transition-colors ${
-                activeTab === "upload"
-                  ? `text-white ${gradientButtonStyle}`
-                  : "bg-muted text-muted-foreground hover:bg-accent"
-              }`}
-            >
+            </TabButton>
+            <TabButton active={activeTab === "upload"} onClick={() => setActiveTab("upload")} position="right">
               File Upload
-            </button>
+            </TabButton>
           </div>
 
           <div className="border-b border-border mb-6"></div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <div>
-              <label className="block text-card-foreground text-sm font-medium mb-2">Subject</label>
-              <div className="relative w-full md:w-[260px]">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                <input
-                  type="text"
-                  placeholder="Search syllabus..."
-                  value={subject}
-                  onChange={(e) => setSubject(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 bg-muted text-card-foreground placeholder-muted-foreground border border-border rounded-full focus:outline-none focus:ring-2 focus:ring-ring"
-                />
-              </div>
-            </div>
+            <FormField label="Subject">
+              <SearchInput
+                placeholder="Search syllabus..."
+                value={subject}
+                onChange={setSubject}
+                className="w-full md:w-[260px]"
+              />
+            </FormField>
 
             <div className="flex justify-end">
-              <div className="w-full md:w-auto">
-                <label className="block text-card-foreground text-sm font-medium mb-2">Target Audience</label>
+              <FormField label="Target Audience" className="w-full md:w-auto">
                 <Select value={targetAudience} onValueChange={setTargetAudience}>
                   <SelectTrigger className="bg-muted border border-border text-card-foreground placeholder:text-muted-foreground rounded-full px-4 h-10 w-full md:w-[240px]">
                     <SelectValue placeholder="Select Audience" />
@@ -88,7 +65,7 @@ export function AddSyllabus() {
                     ))}
                   </SelectContent>
                 </Select>
-              </div>
+              </FormField>
             </div>
           </div>
 
@@ -122,7 +99,7 @@ export function AddSyllabus() {
               Cancel
             </Button>
           </Link>
-          <Button className={`text-white px-8 py-2 h-10 w-full sm:w-auto ${gradientButtonStyle}`}>Add Syllabus</Button>
+          <GradientButton className="w-full sm:w-auto">Add Syllabus</GradientButton>
         </div>
       </div>
     </div>

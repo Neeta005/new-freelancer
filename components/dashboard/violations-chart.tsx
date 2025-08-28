@@ -1,5 +1,6 @@
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { violationChart } from "@/data/violationChart"
+import { ViolationBar } from "@/components/ui/violation-bar"
 
 export function ViolationsChart() {
   const maxValue = Math.max(...violationChart.map((d) => d.value))
@@ -32,32 +33,12 @@ export function ViolationsChart() {
           <span>10%</span>
         </div>
 
-     {/* Bars */}
-<div className="flex-1 flex items-end justify-between ml-8 md:ml-10 mb-4 space-x-1 md:space-x-2">
-  {violationChart?.map((item, index) => {
-    const percentage = (item.value / maxValue) * 100
-
-    return (
-      <div
-        key={index}
-        className="flex flex-col items-center flex-1 max-w-[40px] md:max-w-[60px]"
-      >
-        <div className="w-full bg-secondary rounded-t-lg relative mb-2 h-[200px] overflow-hidden">
-          <div
-            className="bg-gradient-to-t from-orange-500 to-red-500 rounded-t-lg absolute bottom-0 w-full"
-            style={{ height: `${percentage}%` }}
-          />
+        {/* Bars */}
+        <div className="flex-1 flex items-end justify-between ml-8 md:ml-10 mb-4 space-x-1 md:space-x-2">
+          {violationChart?.map((item, index) => (
+            <ViolationBar key={index} label={item.label} value={item.value} maxValue={maxValue} />
+          ))}
         </div>
-        <span className="text-gray-400 text-[8px] md:text-[10px] text-center leading-tight max-w-full">
-          {item.label.split(":")[0]}
-          <br />
-          {item.label.split(":")[1]}
-        </span>
-      </div>
-    )
-  })}
-</div>
-
 
         {/* Avg Point Marker */}
         <div className="absolute left-1/2 -translate-x-1/2 top-[45%] bg-border px-2 py-1 rounded-md">

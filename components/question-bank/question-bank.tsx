@@ -2,19 +2,14 @@
 
 import React, { useState, useMemo } from "react"
 import { ChevronDown, ChevronRight, Plus, Filter, Eye, Edit3, Trash2 } from "lucide-react"
+import { useRouter } from "next/navigation"
 import { ImportCSVModal } from "@/components/modals/import-csv-modal"
 import { MappedImportModal } from "@/components/modals/mapped-import-modal"
 import { QuestionSection } from "@/components/question-section/question-section"
+import { UnifiedBadge } from "@/components/ui/unified-badge"
+import { EditTopicModal } from "@/components/modals/edit-topic-modal"
+import { gradientButtonStyle } from "@/data/syllabus"
 
-const Badge = React.memo(({ value, color }: { value: string | number; color: string }) => (
-  <span
-    className="inline-flex items-center justify-center w-8 h-6 text-xs font-bold text-white rounded-full"
-    style={{ backgroundColor: color }}
-  >
-    {value}
-  </span>
-))
-Badge.displayName = "Badge"
 
 const TargetBadge = React.memo(({ text }: { text: string }) => (
   <span className="inline-flex items-center px-3 py-1 text-xs font-medium text-white bg-gray-500 rounded-full">
@@ -27,9 +22,11 @@ const SubtopicRow = React.memo(
   ({
     subtopic,
     onEyeClick,
+    onEditClick,
   }: {
     subtopic: { name: string; questions: number }
     onEyeClick: (topicName: string) => void
+    onEditClick: (topicName: string) => void
   }) => (
     <div className="grid grid-cols-12 gap-6 items-center py-2 px-3 bg-gray-900 rounded-lg">
       <div className="col-span-3 flex items-center space-x-2">
@@ -38,7 +35,7 @@ const SubtopicRow = React.memo(
       </div>
       <div className="col-span-2"></div>
       <div className="col-span-2">
-        <Badge value="01" color="#8B5CF6" />
+        <UnifiedBadge value="01" variant="primary" />
       </div>
       <div className="col-span-2"></div>
       <div className="col-span-3 flex items-center space-x-2">
@@ -51,7 +48,10 @@ const SubtopicRow = React.memo(
         >
           <Eye className="size-3 text-white" />
         </button>
-        <button className="p-1.5 border border-red-500 hover:bg-gray-600 rounded-lg transition-colors">
+        <button
+          onClick={() => onEditClick(subtopic.name)}
+          className="p-1.5 border border-red-500 hover:bg-gray-600 rounded-lg transition-colors"
+        >
           <Edit3 className="size-3 text-red-500" />
         </button>
       </div>
@@ -61,6 +61,8 @@ const SubtopicRow = React.memo(
 SubtopicRow.displayName = "SubtopicRow"
 
 export default function QuestionBank() {
+  const router = useRouter()
+
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
     design1: false,
     design2: true,
@@ -74,6 +76,12 @@ export default function QuestionBank() {
   const [showQuestionSection, setShowQuestionSection] = useState(false)
   const [selectedFileType, setSelectedFileType] = useState<"xls" | "csv" | "google-sheet" | null>(null)
   const [selectedTopic, setSelectedTopic] = useState<string>("")
+  const [isEditTopicModalOpen, setIsEditTopicModalOpen] = useState(false)
+  const [selectedTopicForEdit, setSelectedTopicForEdit] = useState<{
+    subject: string
+    name: string
+    description?: string
+  } | null>(null)
 
   const designSubtopics = useMemo(
     () => [
@@ -116,6 +124,20 @@ export default function QuestionBank() {
     setShowQuestionSection(true)
   }
 
+  const handleEditClick = (topicName: string) => {
+    setSelectedTopicForEdit({
+      subject: "Design",
+      name: topicName,
+      description: "",
+    })
+    setIsEditTopicModalOpen(true)
+  }
+
+  const handleCloseEditTopicModal = () => {
+    setIsEditTopicModalOpen(false)
+    setSelectedTopicForEdit(null)
+  }
+
   const handleBackFromQuestionSection = () => {
     setShowQuestionSection(false)
     setSelectedTopic("")
@@ -130,13 +152,19 @@ export default function QuestionBank() {
       <div className="bg-card rounded-xl p-5 ">
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-2xl font-bold text-foreground">Question Bank</h1>
+          <div className="flex items-center gap-3">
+            <button className="flex items-center justify-center px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-md text-white font-medium text-sm transition-colors">
+              Back
+            </button>
           <button
-            onClick={handleImportCSV}
-            className="flex items-center justify-center px-4 py-2 gap-2 w-[163px] h-[38px] bg-gradient-to-r from-red-600 to-orange-600 rounded-md text-white font-semibold text-[14px] hover:from-red-700 hover:to-orange-700 transition-all duration-200"
-          >
-            <Plus className="size-4 text-white" />
-            <span>Import CSV</span>
-          </button>
+  onClick={handleImportCSV}
+  className={`flex items-center justify-center px-4 py-2 gap-2 ${gradientButtonStyle} rounded-md text-white font-semibold text-sm shadow-md transition-all duration-200`}
+>
+  <Plus className="size-4 text-white" />
+  <span>Import CSV</span>
+</button>
+
+          </div>
         </div>
 
         <div className="flex items-center justify-between mb-4">
@@ -186,22 +214,28 @@ export default function QuestionBank() {
                   <TargetBadge text="Graphic Designers" />
                 </div>
                 <div className="col-span-2">
-                  <Badge value="03" color="#8B5CF6" />
+                  <UnifiedBadge value="03" variant="primary" />
                 </div>
                 <div className="col-span-2">
-                  <Badge value="18" color="#EF4444" />
+                  <UnifiedBadge value="18" variant="danger" />
                 </div>
-                <div className="col-span-3">
-                  <button className="bg-red-600 hover:bg-red-700 text-white px-4 py-1.5 rounded-lg text-sm transition-colors font-semibold">
-                    Add Question
-                  </button>
-                </div>
+              <div className="col-span-3">
+  <button className="bg-brand-500 hover:bg-brand-600 text-white px-4 py-1.5 rounded-lg text-sm transition-colors font-semibold">
+    Add Question
+  </button>
+</div>
+
               </div>
 
               {expandedSections[sectionId] && (
                 <div className="mt-3 ml-6 space-y-1 rounded-lg bg-gray-800">
                   {designSubtopics.map((subtopic, index) => (
-                    <SubtopicRow key={`${sectionId}-${index}`} subtopic={subtopic} onEyeClick={handleEyeClick} />
+                    <SubtopicRow
+                      key={`${sectionId}-${index}`}
+                      subtopic={subtopic}
+                      onEyeClick={handleEyeClick}
+                      onEditClick={handleEditClick}
+                    />
                   ))}
                 </div>
               )}
@@ -216,6 +250,7 @@ export default function QuestionBank() {
         onTemplateSelect={handleTemplateSelect}
       />
       <MappedImportModal isOpen={isMappedModalOpen} onClose={handleCloseMappedModal} fileType={selectedFileType} />
+      <EditTopicModal isOpen={isEditTopicModalOpen} onClose={handleCloseEditTopicModal} topic={selectedTopicForEdit} />
     </div>
   )
 }

@@ -1,8 +1,10 @@
 "use client"
 
 import type React from "react"
-import { Upload, File, X } from "lucide-react"
+import { Upload } from "lucide-react"
 import type { UploadedFile } from "@/data/syllabus"
+import { FileItem } from "@/components/ui/file-item"
+import { GradientButton } from "@/components/ui/gradient-button"
 
 interface FileUploadSectionProps {
   uploadedFiles: UploadedFile[]
@@ -40,19 +42,7 @@ export function FileUploadSection({ uploadedFiles, onFilesChange }: FileUploadSe
             <p className="text-muted-foreground text-sm">Files you want to add</p>
             <div className="space-y-2">
               {uploadedFiles.map((file) => (
-                <div key={file.id} className="flex items-center justify-between bg-muted p-3 rounded-md">
-                  <div className="flex items-center gap-2">
-                    <File className="w-4 h-4 text-muted-foreground" />
-                    <span className="text-foreground text-sm">{file.name}</span>
-                    <span className="text-muted-foreground text-xs">({file.size})</span>
-                  </div>
-                  <button
-                    onClick={() => removeFile(file.id)}
-                    className="text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
+                <FileItem key={file.id} name={file.name} size={file.size} onRemove={() => removeFile(file.id)} />
               ))}
             </div>
           </div>
@@ -66,9 +56,9 @@ export function FileUploadSection({ uploadedFiles, onFilesChange }: FileUploadSe
           <Upload className="w-12 h-12 text-muted-foreground" />
           <p className="text-foreground font-medium">Drop your file or click here to upload the file</p>
           <p className="text-muted-foreground text-sm">Supported formats: PDF, DOC, DOCX</p>
-          <label className="bg-gradient-to-r from-orange-500 to-pink-600 hover:from-orange-600 hover:to-pink-700 text-white px-6 py-2 rounded-md cursor-pointer transition-colors">
+          <label className="cursor-pointer">
             <input type="file" className="hidden" multiple onChange={handleFileUpload} accept=".pdf,.doc,.docx" />
-            Upload Files
+            <GradientButton>Upload Files</GradientButton>
           </label>
         </div>
       </div>

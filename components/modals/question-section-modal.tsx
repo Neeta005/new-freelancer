@@ -1,19 +1,27 @@
 "use client"
 
 import React, { useState } from "react"
-import { Filter, ChevronLeft, ChevronRight, Trash2, Eye, Edit } from "lucide-react"
+import { Filter, Trash2, Eye, Edit } from "lucide-react"
 import { mockQuestions } from "@/data/questions"
 import { TableHeader } from "@/components/ui/table-header"
 import { TableRow } from "@/components/ui/table-row"
 
-// Define the props interface - this was likely missing
+// ✅ Import your reusable pagination components
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationPrevious,
+  PaginationNext,
+} from "@/components/ui/pagination"
+
 interface QuestionSectionModalProps {
   isOpen: boolean
   onClose: () => void
   topicName?: string
 }
 
-// Define other types for better type safety
 interface Question {
   id: string | number
   question: string
@@ -38,14 +46,17 @@ const tableColumns: TableColumn[] = [
   { span: 1, label: "Actions" },
 ]
 
-// Fixed: Added generic type parameter and proper typing
 export const QuestionSectionModal = React.memo<QuestionSectionModalProps>(
   ({ isOpen, onClose, topicName = "Design" }) => {
     const [currentPage, setCurrentPage] = useState<number>(1)
     const [selectedDesign, setSelectedDesign] = useState<string>("Design")
     const [selectedUIDesign, setSelectedUIDesign] = useState<string>("UI Design")
 
-    const getDifficultyColor = (difficulty: Question['difficulty']): string => {
+    const itemsPerPage = 5
+    const typedQuestions = mockQuestions as Question[]
+    const totalPages = Math.ceil(typedQuestions.length / itemsPerPage)
+
+    const getDifficultyColor = (difficulty: Question["difficulty"]): string => {
       switch (difficulty) {
         case "Easy":
           return "bg-green-primary"
@@ -58,14 +69,17 @@ export const QuestionSectionModal = React.memo<QuestionSectionModalProps>(
       }
     }
 
-    const getStatusColor = (status: Question['status']): string => {
+    const getStatusColor = (status: Question["status"]): string => {
       return status === "Published" ? "bg-green-primary" : "bg-purple-primary"
     }
 
     if (!isOpen) return null
 
-    // Type assertion for mockQuestions if the imported data lacks proper types
-    const typedQuestions = mockQuestions as Question[]
+    // Paginate questions
+    const paginatedQuestions = typedQuestions.slice(
+      (currentPage - 1) * itemsPerPage,
+      currentPage * itemsPerPage
+    )
 
     return (
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 backdrop-blur-sm">
@@ -81,19 +95,19 @@ export const QuestionSectionModal = React.memo<QuestionSectionModalProps>(
               >
                 Back
               </button>
-              <button 
+              <button
                 className="px-4 py-2 bg-orange-primary text-white rounded-lg hover:bg-orange-hover transition-colors"
                 type="button"
               >
                 Preview
               </button>
-              <button 
+              <button
                 className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
                 type="button"
               >
                 Add Question
               </button>
-              <button 
+              <button
                 className="px-4 py-2 bg-orange-primary text-white rounded-lg hover:bg-orange-hover transition-colors"
                 type="button"
               >
@@ -131,37 +145,46 @@ export const QuestionSectionModal = React.memo<QuestionSectionModalProps>(
           <div className="bg-secondary rounded-xl overflow-hidden border border-dark-border mb-6">
             <TableHeader columns={tableColumns} variant="modal" />
 
-            {/* Table Body */}
-            {typedQuestions.map((question: Question, index: number) => (
+            {paginatedQuestions.map((question: Question, index: number) => (
               <TableRow key={question.id} variant="modal">
-                <div className="col-span-1 text-white text-sm">{index + 1}</div>
+                <div className="col-span-1 text-white text-sm">
+                  {(currentPage - 1) * itemsPerPage + index + 1}
+                </div>
                 <div className="col-span-5 text-white text-sm">{question.question}</div>
                 <div className="col-span-2 text-gray-text text-sm">{question.type}</div>
                 <div className="col-span-1">
-                  <span className={`px-2 py-1 rounded text-xs text-white ${getDifficultyColor(question.difficulty)}`}>
+                  <span
+                    className={`px-2 py-1 rounded text-xs text-white ${getDifficultyColor(
+                      question.difficulty
+                    )}`}
+                  >
                     {question.difficulty}
                   </span>
                 </div>
                 <div className="col-span-1 text-white text-sm">{question.marks}</div>
                 <div className="col-span-1">
-                  <span className={`px-2 py-1 rounded text-xs text-white ${getStatusColor(question.status)}`}>
+                  <span
+                    className={`px-2 py-1 rounded text-xs text-white ${getStatusColor(
+                      question.status
+                    )}`}
+                  >
                     {question.status}
                   </span>
                 </div>
                 <div className="col-span-1 flex items-center gap-1">
-                  <button 
+                  <button
                     className="p-1 text-orange-primary hover:bg-dark-border rounded transition-colors"
                     type="button"
                   >
                     <Trash2 size={16} />
                   </button>
-                  <button 
+                  <button
                     className="p-1 text-white hover:bg-dark-border rounded transition-colors"
                     type="button"
                   >
                     <Eye size={16} />
                   </button>
-                  <button 
+                  <button
                     className="p-1 text-red-primary hover:bg-dark-border rounded transition-colors"
                     type="button"
                   >
@@ -172,45 +195,48 @@ export const QuestionSectionModal = React.memo<QuestionSectionModalProps>(
             ))}
           </div>
 
-          {/* Pagination */}
-          <div className="flex items-center justify-between">
-            <button 
-              className="flex items-center gap-2 px-4 py-2 bg-dark-border text-white rounded-lg hover:bg-border transition-colors"
-              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-              type="button"
-            >
-              <ChevronLeft size={16} />
-              Prev
-            </button>
-            <div className="flex items-center gap-2">
-              <button 
-                className="size-8 bg-orange-primary text-white rounded flex items-center justify-center text-sm"
-                onClick={() => setCurrentPage(1)}
-                type="button"
-              >
-                1
-              </button>
-              <button 
-                className="size-8 bg-dark-border text-white rounded flex items-center justify-center text-sm hover:bg-border transition-colors"
-                onClick={() => setCurrentPage(2)}
-                type="button"
-              >
-                2
-              </button>
-            </div>
-            <button 
-              className="flex items-center gap-2 px-4 py-2 bg-orange-primary text-white rounded-lg hover:bg-orange-hover transition-colors"
-              onClick={() => setCurrentPage(prev => prev + 1)}
-              type="button"
-            >
-              Next
-              <ChevronRight size={16} />
-            </button>
-          </div>
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    setCurrentPage((prev) => Math.max(1, prev - 1))
+                  }}
+                />
+              </PaginationItem>
+
+              {Array.from({ length: totalPages }).map((_, i) => (
+                <PaginationItem key={i}>
+                  <PaginationLink
+                    href="#"
+                    isActive={currentPage === i + 1}
+                    onClick={(e) => {
+                      e.preventDefault()
+                      setCurrentPage(i + 1)
+                    }}
+                  >
+                    {i + 1}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
+
+              <PaginationItem>
+                <PaginationNext
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    setCurrentPage((prev) => Math.min(totalPages, prev + 1))
+                  }}
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
         </div>
       </div>
     )
-  },
+  }
 )
 
 QuestionSectionModal.displayName = "QuestionSectionModal"

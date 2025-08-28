@@ -19,7 +19,7 @@ export function TopPerformers() {
       {/* Performer List */}
       <div className="space-y-3 md:space-y-4 flex-1">
         {topPerformers.map((performer) => (
-          <PerformerCard key={performer.id} performer={performer} />
+          <PerformerCard key={performer.id} {...performer} />
         ))}
       </div>
     </div>

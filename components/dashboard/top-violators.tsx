@@ -19,7 +19,7 @@ export function TopViolators() {
       {/* Violator List */}
       <div className="space-y-3 md:space-y-4 flex-1">
         {topViolators?.map((violator) => (
-          <ViolatorCard key={violator.id} violator={violator} />
+          <ViolatorCard key={violator.id} {...violator} />
         ))}
       </div>
     </div>

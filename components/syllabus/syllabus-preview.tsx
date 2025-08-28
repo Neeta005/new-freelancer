@@ -1,5 +1,7 @@
-import { FileText, File } from "lucide-react"
+import { FileText } from "lucide-react"
 import type { Section, UploadedFile } from "@/data/syllabus"
+import { EmptyState } from "@/components/ui/empty-state"
+import { FileItem } from "@/components/ui/file-item"
 
 interface SyllabusPreviewProps {
   subject: string
@@ -18,25 +20,21 @@ export function SyllabusPreview({ subject, targetAudience, sections, uploadedFil
 
   if (activeTab === "manual" && !hasManualContent) {
     return (
-      <div className="text-center flex flex-col items-center justify-center min-h-[300px]">
-        <div className="mb-4">
-          <FileText className="w-16 h-16 text-muted-foreground mx-auto" />
-        </div>
-        <h4 className="text-foreground text-lg font-semibold mb-2">No Course Content!</h4>
-        <p className="text-muted-foreground text-sm">Enter Course Content to see the preview</p>
-      </div>
+      <EmptyState
+        icon={<FileText className="w-16 h-16 text-muted-foreground mx-auto" />}
+        title="No Course Content!"
+        description="Enter Course Content to see the preview"
+      />
     )
   }
 
   if (activeTab === "upload" && !hasUploadedFiles) {
     return (
-      <div className="text-center flex flex-col items-center justify-center min-h-[300px]">
-        <div className="mb-4">
-          <FileText className="w-16 h-16 text-muted-foreground mx-auto" />
-        </div>
-        <h4 className="text-foreground text-lg font-semibold mb-2">No files Uploaded!</h4>
-        <p className="text-muted-foreground text-sm">Upload files to see the preview</p>
-      </div>
+      <EmptyState
+        icon={<FileText className="w-16 h-16 text-muted-foreground mx-auto" />}
+        title="No files Uploaded!"
+        description="Upload files to see the preview"
+      />
     )
   }
 
@@ -83,9 +81,8 @@ export function SyllabusPreview({ subject, targetAudience, sections, uploadedFil
           <h4 className="text-foreground font-semibold mb-3">Uploaded Files:</h4>
           <ul className="space-y-2">
             {uploadedFiles.map((file) => (
-              <li key={file.id} className="text-muted-foreground text-sm flex items-center gap-2">
-                <File className="w-4 h-4 text-muted-foreground" />
-                {file.name} <span className="text-muted-foreground text-xs">({file.size})</span>
+              <li key={file.id}>
+                <FileItem name={file.name} size={file.size} />
               </li>
             ))}
           </ul>

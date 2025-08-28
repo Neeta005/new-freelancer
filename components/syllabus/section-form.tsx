@@ -1,9 +1,8 @@
 "use client"
-import { ChevronDown, Plus, Minus } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+
 import type { Section, LessonUnit } from "@/data/syllabus"
-import { gradientButtonStyle } from "@/data/syllabus"
+import { SectionRow } from "./section-row"
+import { LessonRow } from "./lesson-row"
 
 interface SectionFormProps {
   sections: Section[]
@@ -74,57 +73,22 @@ export function SectionForm({ sections, onSectionsChange }: SectionFormProps) {
       <div className="space-y-6">
         {sections.map((section) => (
           <div key={section.id} className="space-y-4">
-            <div className="flex items-center gap-3">
-              <ChevronDown className="text-muted-foreground w-4 h-4 flex-shrink-0 mt-6" />
-              <div className="flex-1">
-                <label className="block text-foreground text-sm font-medium mb-1">Section / Module</label>
-                <div className="flex items-center gap-3">
-                  <Input
-                    placeholder="Type here..."
-                    value={section.title}
-                    onChange={(e) => updateSectionTitle(section.id, e.target.value)}
-                    className="flex-1 bg-muted border border-border text-foreground placeholder:text-muted-foreground h-10 px-4"
-                  />
-                  <Button
-                    onClick={addSection}
-                    className={`text-white rounded-full flex-shrink-0 h-10 w-10 flex items-center justify-center ${gradientButtonStyle}`}
-                    size="sm"
-                  >
-                    <Plus className="w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
-            </div>
+            <SectionRow
+              title={section.title}
+              onTitleChange={(title) => updateSectionTitle(section.id, title)}
+              onAddSection={addSection}
+            />
 
             <div className="pl-7 space-y-3">
               {section.lessons.map((lesson) => (
-                <div key={lesson.id} className="flex items-center gap-3">
-                  <div className="flex-1">
-                    <label className="block text-foreground text-sm font-medium mb-1">Lesson / Unit</label>
-                    <Input
-                      placeholder="Type here..."
-                      value={lesson.value}
-                      onChange={(e) => updateLessonValue(section.id, lesson.id, e.target.value)}
-                      className="flex-1 bg-muted border border-border text-foreground placeholder:text-muted-foreground rounded-full h-10 px-4"
-                    />
-                  </div>
-                  <div className="flex gap-2">
-                    <Button
-                      onClick={() => addLesson(section.id)}
-                      className={`text-white rounded-full h-10 w-10 flex items-center justify-center ${gradientButtonStyle}`}
-                      size="sm"
-                    >
-                      <Plus className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      onClick={() => removeLesson(section.id, lesson.id)}
-                      className="bg-muted hover:bg-accent text-foreground rounded-full h-10 w-10 flex items-center justify-center"
-                      size="sm"
-                    >
-                      <Minus className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
+                <LessonRow
+                  key={lesson.id}
+                  value={lesson.value}
+                  onValueChange={(value) => updateLessonValue(section.id, lesson.id, value)}
+                  onAddLesson={() => addLesson(section.id)}
+                  onRemoveLesson={() => removeLesson(section.id, lesson.id)}
+                  canRemove={section.lessons.length > 1}
+                />
               ))}
             </div>
           </div>

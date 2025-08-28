@@ -1,23 +1,30 @@
-import type { ReactNode } from "react"
+import React from "react"
+import type { LucideIcon } from "lucide-react"
 
-interface StatsCardProps {
+interface StatCardProps {
   title: string
   value: string | number
-  icon: ReactNode
+  icon: LucideIcon
   iconColor: string
-  className?: string
+  iconBg: string
 }
 
-export function StatsCard({ title, value, icon, iconColor, className = "" }: StatsCardProps) {
+
+const StatCard = React.memo<StatCardProps>(({ title, value, icon: Icon, iconColor, iconBg }) => {
   return (
-    <div className={`bg-slate-800/50 rounded-lg p-6 border border-slate-700/50 ${className}`}>
+    <div className="bg-card rounded-lg p-4 border border-border">
       <div className="flex items-center gap-3">
-        <div className={`p-2 rounded-lg ${iconColor}`}>{icon}</div>
+        <div className={`size-10 ${iconBg} rounded-lg flex items-center justify-center`}>
+          <Icon size={20} className={iconColor} />
+        </div>
         <div>
-          <p className="text-slate-400 text-sm font-medium">{title}</p>
-          <p className="text-white text-2xl font-bold">{value}</p>
+          <p className="text-white text-sm">{title}</p>
+          <p className="text-gray-300 text-lg">{value}</p>
         </div>
       </div>
     </div>
   )
-}
+})
+
+StatCard.displayName = "StatCard"
+export { StatCard }

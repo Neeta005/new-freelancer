@@ -4,6 +4,12 @@ import { useState, ChangeEvent } from "react"
 import { useRouter } from "next/navigation"
 import { ChevronDown, Plus, ArrowLeft, Save } from "lucide-react"
 import { sampleQuestion, Option, QuestionData } from "@/data/questionData"
+import {
+  questionStatus,
+  questionDifficulties,
+  questionTypes,
+  questionTopics,
+} from "@/data/questionMeta"
 
 interface EditQuestionFormProps {
   questionId: string
@@ -26,6 +32,7 @@ export default function EditQuestionForm({ questionId }: EditQuestionFormProps) 
 
   const handleSave = (): void => {
     const payload: QuestionData = { question, topic, type, difficulty, status, marks, options }
+    // TODO: send payload to API or state management
     router.back()
   }
 
@@ -140,9 +147,11 @@ export default function EditQuestionForm({ questionId }: EditQuestionFormProps) 
                   }
                   className="w-full bg-secondary border border-white rounded-lg px-3 md:px-4 py-2 text-white focus:outline-none appearance-none text-sm md:text-base"
                 >
-                  <option value="UI Design">UI Design</option>
-                  <option value="UX Design">UX Design</option>
-                  <option value="Interactive Design">Interactive Design</option>
+                  {questionTopics.map((t) => (
+                    <option key={t} value={t}>
+                      {t}
+                    </option>
+                  ))}
                 </select>
                 <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
               </div>
@@ -161,9 +170,11 @@ export default function EditQuestionForm({ questionId }: EditQuestionFormProps) 
                       }
                       className="w-full bg-secondary border border-white rounded-lg px-3 md:px-4 py-2 text-white focus:outline-none appearance-none text-sm md:text-base"
                     >
-                      <option value="MCQS">MCQS</option>
-                      <option value="True/False">True/False</option>
-                      <option value="Descriptive">Descriptive</option>
+                      {questionTypes.map((qt) => (
+                        <option key={qt} value={qt}>
+                          {qt}
+                        </option>
+                      ))}
                     </select>
                     <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                   </div>
@@ -173,7 +184,7 @@ export default function EditQuestionForm({ questionId }: EditQuestionFormProps) 
                 <div>
                   <label className="block text-sm font-medium mb-1">Difficulty:</label>
                   <div className="flex flex-wrap gap-2">
-                    {(["Easy", "Medium", "Hard"] as typeof sampleQuestion.difficulty[]).map((level) => (
+                    {questionDifficulties.map((level) => (
                       <button
                         key={level}
                         onClick={() => handleDifficultyChange(level)}
@@ -198,7 +209,7 @@ export default function EditQuestionForm({ questionId }: EditQuestionFormProps) 
                 <div>
                   <label className="block text-sm font-medium mb-1">Status:</label>
                   <div className="flex flex-wrap gap-2">
-                    {(["Draft", "Published"] as typeof sampleQuestion.status[]).map((statusOption) => (
+                    {questionStatus.map((statusOption) => (
                       <button
                         key={statusOption}
                         onClick={() => handleStatusChange(statusOption)}
